@@ -5,11 +5,9 @@ const COMPANY_DATA = {
   address: "Immeuble Golden Tower B8.2, Centre Urbain Nord, Tunis",
   founders: ["Amine ABDERRAHMEN (Fondateur / Founder)", "Nadia YAICH (Associée / Partner)"],
   clients: [
-    "Aziza", "Vistaprint", "ABCO", "Linedata", "Dr. Oetker", "Leoni", "Altrad",
-    "Coca Cola", "Hutchinson", "Vilavi", "Stellantis", "Orange", "TotalEnergies",
-    "Vermeg", "Sagemcom", "Sanofi", "Vivo Energy", "Air Liquide", "Heineken", "Societe Generale"
+    "Aziza", "Vistaprint", "ABCO", "Linedata", "Dr. Oetker", "Leoni", "Altrad", "Hutchinson", "Vilavi"
   ],
-  partners: ["UGFS", "BIAT Capital", "BH Equity", "Tuninvest", "Zitouna Capital", "CDC", "RMBV", "AfricInvest"],
+  partners: ["UGFS", "BIAT Capital", "BH Equity", "Tuninvest", "Zitouna Capital", "RMBV"],
 };
 
 function levenshtein(a: string, b: string): number {
