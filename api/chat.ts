@@ -1,6 +1,8 @@
 // ============================================================
-// MGI BFC - api/chat.ts
+// MGI BFC - api/chat.ts (AVEC MÉMOIRE ET ANALYTICS)
 // ============================================================
+
+import { saveInteraction, getUserContext, getTopServices, incrementVisitor } from './chatMemory';
 
 const COMPANY_DATA = {
   name: "MGI BFC",
@@ -75,6 +77,7 @@ function detectLanguage(message: string): "fr" | "en" {
   frWords.forEach(w => { if (words.includes(w)) frScore++; });
   enWords.forEach(w => { if (words.includes(w)) enScore++; });
 
+  // 🔧 FIX : était "enScore > enScore" (toujours false)
   if (frScore > enScore) { lastLanguage = "fr"; return "fr"; }
   if (enScore > frScore) { lastLanguage = "en"; return "en"; }
   return lastLanguage;
@@ -290,7 +293,7 @@ function detectButtonContext(msg: string): string {
   if (["contact","joindre","email","mail","telephone","adresse"].some(k => msg.includes(k))) return "contact";
   if (["equipe","team","fondateur","founder","amine","nadia"].some(k => msg.includes(k))) return "team";
   if (["client","reference","partenaire","partner"].some(k => msg.includes(k))) return "clients";
-  return "services"; // fallback
+  return "services";
 }
 
 // ============================================================
@@ -308,23 +311,104 @@ function getResponse(message: string): string {
 }
 
 // ============================================================
-// Handler Express
+// Sanitisation du sessionId
+// ============================================================
+function sanitizeSessionId(raw: any): string {
+  if (typeof raw === "string" && /^[\w\-]{4,64}$/.test(raw)) return raw;
+  return `anon-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+}
+
+// ============================================================
+// Handler Express (AVEC MÉMOIRE)
 // ============================================================
 export default async function handler(req: any, res: any) {
   console.log("✅ /api/chat appelé", req.method, req.body);
   if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
-  const { message } = req.body;
-  if (!message) return res.status(400).json({ error: "Message requis" });
+  const { message, sessionId } = req.body;
+  if (!message || typeof message !== "string" || message.trim().length === 0) {
+    return res.status(400).json({ error: "Message requis" });
+  }
+
+  // 🔧 FIX : sessionId sanitisé
+  const sid = sanitizeSessionId(sessionId);
 
   try {
-    const lang    = detectLanguage(message);
-    const reply   = getResponse(message);
-    const context = detectButtonContext(normalize(message));
+    const lang = detectLanguage(message);
+    const reply = getResponse(message);
+    const normalizedMsg = normalize(message);
+
+    // Détection de l'intention et du service pour les analytics
+    let intention = "general";
+    let serviceLie: string | undefined = undefined;
+
+    if (messageMatchesKeyword(normalizedMsg, "audit") || messageMatchesKeyword(normalizedMsg, "commissariat")) {
+      intention = "audit";
+      serviceLie = "Audit & Commissariat";
+    } else if (
+      messageMatchesKeyword(normalizedMsg, "due diligence") ||
+      messageMatchesKeyword(normalizedMsg, "valorisation") ||
+      messageMatchesKeyword(normalizedMsg, "levee") ||
+      messageMatchesKeyword(normalizedMsg, "faisabilite")
+    ) {
+      intention = "transaction";
+      serviceLie = "Transaction Advisory";
+    } else if (
+      messageMatchesKeyword(normalizedMsg, "paie") ||
+      messageMatchesKeyword(normalizedMsg, "fiscal") ||
+      messageMatchesKeyword(normalizedMsg, "comptabilite") ||
+      messageMatchesKeyword(normalizedMsg, "consolidation")
+    ) {
+      intention = "comptabilite";
+      serviceLie = "Comptabilité & Outsourcing";
+    } else if (messageMatchesKeyword(normalizedMsg, "contact") || messageMatchesKeyword(normalizedMsg, "email")) {
+      intention = "contact";
+    } else if (messageMatchesKeyword(normalizedMsg, "equipe") || messageMatchesKeyword(normalizedMsg, "team")) {
+      intention = "team";
+    }
+
+    // Sauvegarde de l'interaction
+    saveInteraction(sid, message, intention, serviceLie, reply);
+
+    // Incrémentation du visiteur
+    incrementVisitor(sid);
+
+    const context = detectButtonContext(normalizedMsg);
     const buttons = BUTTONS_MAP[context]?.[lang] ?? BUTTONS_MAP["services"][lang];
 
-    console.log("✅ lang:", lang, "| context:", context);
-    res.status(200).json({ reply, buttons, lang });
+    // Enrichissement : suggestion basée sur les services populaires
+    let finalReply = reply;
+    if (
+      normalizedMsg.includes("service") ||
+      normalizedMsg.includes("offre") ||
+      normalizedMsg.includes("proposez") ||
+      normalizedMsg.includes("what do you do")
+    ) {
+      const topServices = getTopServices(3);
+      if (topServices.length > 0 && lang === "fr") {
+        finalReply += `\n\n📊 *Nos services les plus demandés récemment :* ${topServices.map(s => s[0]).join(", ")}.\nSouhaitez-vous plus d'informations sur l'un d'eux ?`;
+      } else if (topServices.length > 0 && lang === "en") {
+        finalReply += `\n\n📊 *Our most requested services recently:* ${topServices.map(s => s[0]).join(", ")}.\nWould you like more information on any of them?`;
+      }
+    }
+
+    // Recommandation personnalisée
+    if (
+      normalizedMsg.includes("recommand") ||
+      normalizedMsg.includes("suggest") ||
+      normalizedMsg.includes("conseille") ||
+      normalizedMsg.includes("advise")
+    ) {
+      const topIntentions = getTopServices(2);
+      if (topIntentions.length > 0 && lang === "fr") {
+        finalReply = `D'après nos échanges récents avec d'autres clients, nos services les plus pertinents pour vous pourraient être : **${topIntentions.map(s => s[0]).join(" et ")}**. Souhaitez-vous plus de détails ?`;
+      } else if (topIntentions.length > 0 && lang === "en") {
+        finalReply = `Based on recent interactions with other clients, our most relevant services for you could be: **${topIntentions.map(s => s[0]).join(" and ")}**. Would you like more details?`;
+      }
+    }
+
+    console.log("✅ lang:", lang, "| context:", context, "| session:", sid.slice(-8));
+    res.status(200).json({ reply: finalReply, buttons, lang });
   } catch (error: any) {
     console.error("❌ Erreur chatbot:", error?.message);
     res.status(500).json({ error: "Erreur interne." });

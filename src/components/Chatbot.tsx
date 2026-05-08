@@ -33,6 +33,19 @@ export const Chatbot: React.FC<ChatbotProps> = ({ lang = 'fr' }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Session ID persistant pour la mémoire backend
+  const [sessionId] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem('chat_session_id');
+      if (stored) return stored;
+      const newId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      sessionStorage.setItem('chat_session_id', newId);
+      return newId;
+    } catch (e) {
+      return `fallback-${Date.now()}`;
+    }
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -52,13 +65,13 @@ export const Chatbot: React.FC<ChatbotProps> = ({ lang = 'fr' }) => {
   // Reset si la langue change (chatbot fermé)
   useEffect(() => {
     if (!isOpen) setMessages([]);
-  }, [lang]);
+  }, [lang, isOpen]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // ── Envoi d'un message ──────────────────────────────────────
+  // ── Envoi d'un message (AVEC SESSION ID) ──────────────────────
   const handleSend = async (text?: string) => {
     const userMessage = (text ?? input).trim();
     if (!userMessage || isLoading) return;
@@ -71,7 +84,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ lang = 'fr' }) => {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ message: userMessage, sessionId }), // AJOUT sessionId
       });
 
       if (!res.ok) throw new Error(`Erreur réseau : ${res.status}`);

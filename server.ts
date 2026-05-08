@@ -3,6 +3,7 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import contactHandler from "./api/contact.ts";
 import chatHandler from "./api/chat.ts";
+import analyticsHandler from "./api/analytics.ts"; // NOUVEAU
 
 async function startServer() {
   const app = express();
@@ -13,6 +14,7 @@ async function startServer() {
   // API Routes
   app.post("/api/contact", contactHandler);
   app.post("/api/chat", chatHandler);
+  app.get("/api/analytics", analyticsHandler); // NOUVEAU
 
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -23,7 +25,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get("*all", (req, res) => {
+    app.get("*", (req, res) => {  // Correction : "*all" → "*"
       res.sendFile(path.join(distPath, "index.html"));
     });
   }

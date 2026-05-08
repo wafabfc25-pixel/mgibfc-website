@@ -1,0 +1,142 @@
+{
+  "totalVisitors": 2,
+  "totalChatInteractions": 14,
+  "questionsFrequentes": {
+    "nos services": 2,
+    "transaction advisory": 3,
+    "feasibility study": 2,
+    "audit & statutory": 1,
+    "bonjour": 1,
+    "nous contacter": 1,
+    "send an email": 2,
+    "valuation": 1,
+    "how much": 1
+  },
+  "servicesDemandes": {
+    "Audit & Commissariat": 1
+  },
+  "intentions": {
+    "general": 10,
+    "audit": 1,
+    "contact": 3
+  },
+  "historiqueMessages": [
+    {
+      "id": "1778251305887-lwfkyc",
+      "sessionId": "1778251290483-os1c3m1gm",
+      "timestamp": "2026-05-08T14:41:45.887Z",
+      "question": "Nos services",
+      "intention": "general",
+      "reponse": "MGI BFC offers 3 main service areas:\n1. **Audit & Statutory Audit**\n2. **Transaction Advisory Services**\n3. **Accounting & Outsourcing**\n\nWhich one would you like more information on?"
+    },
+    {
+      "id": "1778251307533-99leu7",
+      "sessionId": "1778251290483-os1c3m1gm",
+      "timestamp": "2026-05-08T14:41:47.533Z",
+      "question": "Transaction Advisory",
+      "intention": "general",
+      "reponse": "Our **Transaction Advisory Services** division covers:\n- **Business valuation**\n- **Due diligence**\n- **Feasibility study**\n- **Restructuring**\n- **Fundraising advisory**\n\nWould you like me to explain any of these?"
+    },
+    {
+      "id": "1778251309091-re5gwl",
+      "sessionId": "1778251290483-os1c3m1gm",
+      "timestamp": "2026-05-08T14:41:49.091Z",
+      "question": "Feasibility study",
+      "intention": "general",
+      "reponse": "A **feasibility study** analyzes the economic, financial, and technical viability of a project before launch. It allows for an informed decision on the investment opportunity."
+    },
+    {
+      "id": "1778251310274-fu8j4d",
+      "sessionId": "1778251290483-os1c3m1gm",
+      "timestamp": "2026-05-08T14:41:50.274Z",
+      "question": "Audit & Statutory",
+      "intention": "audit",
+      "serviceLie": "Audit & Commissariat",
+      "reponse": "Our **Audit & Statutory Audit** division includes:\n- **Legal audit** — mandatory accounts certification\n- **Contractual audit** — verification on request\n- **Program/project audit** — funds usage control\n- **Internal control** — internal process evaluation\n\nWould you like me to explain any of these in detail?"
+    },
+    {
+      "id": "1778251313532-6qvvyf",
+      "sessionId": "1778251290483-os1c3m1gm",
+      "timestamp": "2026-05-08T14:41:53.532Z",
+      "question": "bonjour",
+      "intention": "general",
+      "reponse": "Bonjour ! Je suis l'assistant de MGI BFC. Comment puis-je vous aider aujourd'hui ?"
+    },
+    {
+      "id": "1778251315659-ukyvtl",
+      "sessionId": "1778251290483-os1c3m1gm",
+      "timestamp": "2026-05-08T14:41:55.659Z",
+      "question": "Nous contacter",
+      "intention": "contact",
+      "reponse": "**Contractual audit** is a voluntary mission requested by a company or third party. It can cover a specific transaction, project, acquisition, or any particular financial verification need."
+    },
+    {
+      "id": "1778251317385-j1fytk",
+      "sessionId": "1778251290483-os1c3m1gm",
+      "timestamp": "2026-05-08T14:41:57.385Z",
+      "question": "Send an email",
+      "intention": "contact",
+      "reponse": "Which service would you like more information on?\n\n- **Audit** — legal, contractual, internal control\n- **Transaction Advisory** — valuation, due diligence, fundraising\n- **Accounting & Outsourcing** — payroll, tax, consolidation\n\nContact us: contact@bfc.com.tn"
+    },
+    {
+      "id": "1778251319844-vad6qp",
+      "sessionId": "1778251290483-os1c3m1gm",
+      "timestamp": "2026-05-08T14:41:59.844Z",
+      "question": "Send an email",
+      "intention": "contact",
+      "reponse": "Which service would you like more information on?\n\n- **Audit** — legal, contractual, internal control\n- **Transaction Advisory** — valuation, due diligence, fundraising\n- **Accounting & Outsourcing** — payroll, tax, consolidation\n\nContact us: contact@bfc.com.tn"
+    },
+    {
+      "id": "1778251346490-fbr6k3",
+      "sessionId": "1778251341566-lta35n30r",
+      "timestamp": "2026-05-08T14:42:26.490Z",
+      "question": "Nos services",
+      "intention": "general",
+      "reponse": "MGI BFC offers 3 main service areas:\n1. **Audit & Statutory Audit**\n2. **Transaction Advisory Services**\n3. **Accounting & Outsourcing**\n\nWhich one would you like more information on?"
+    },
+    {
+      "id": "1778251348186-cgl8hz",
+      "sessionId": "1778251341566-lta35n30r",
+      "timestamp": "2026-05-08T14:42:28.186Z",
+      "question": "Transaction Advisory",
+      "intention": "general",
+      "reponse": "Our **Transaction Advisory Services** division covers:\n- **Business valuation**\n- **Due diligence**\n- **Feasibility study**\n- **Restructuring**\n- **Fundraising advisory**\n\nWould you like me to explain any of these?"
+    },
+    {
+      "id": "1778251349546-a19vz4",
+      "sessionId": "1778251341566-lta35n30r",
+      "timestamp": "2026-05-08T14:42:29.546Z",
+      "question": "Feasibility study",
+      "intention": "general",
+      "reponse": "A **feasibility study** analyzes the economic, financial, and technical viability of a project before launch. It allows for an informed decision on the investment opportunity."
+    },
+    {
+      "id": "1778251350873-4t6osr",
+      "sessionId": "1778251341566-lta35n30r",
+      "timestamp": "2026-05-08T14:42:30.873Z",
+      "question": "Transaction Advisory",
+      "intention": "general",
+      "reponse": "Our **Transaction Advisory Services** division covers:\n- **Business valuation**\n- **Due diligence**\n- **Feasibility study**\n- **Restructuring**\n- **Fundraising advisory**\n\nWould you like me to explain any of these?"
+    },
+    {
+      "id": "1778251352427-w7oiu7",
+      "sessionId": "1778251341566-lta35n30r",
+      "timestamp": "2026-05-08T14:42:32.427Z",
+      "question": "Valuation",
+      "intention": "general",
+      "reponse": "**Business valuation** consists of estimating the economic value of a company. We use various methods (DCF, market multiples, net assets) to determine a fair and defensible value."
+    },
+    {
+      "id": "1778251355708-2123cj",
+      "sessionId": "1778251341566-lta35n30r",
+      "timestamp": "2026-05-08T14:42:35.708Z",
+      "question": "how much",
+      "intention": "general",
+      "reponse": "I'm only available to answer questions about MGI BFC. For anything else, feel free to reach us at contact@bfc.com.tn"
+    }
+  ],
+  "sessionsCounted": [
+    "1778251290483-os1c3m1gm",
+    "1778251341566-lta35n30r"
+  ]
+}

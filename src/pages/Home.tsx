@@ -429,16 +429,29 @@ const Contact = ({ t }: { t: any }) => {
             </h2>
             <p className="mb-16 max-w-lg text-justify">{t.contact.desc}</p>
             
-            <div className="space-y-12">
+            <div className="space-y-10">
               <div className="flex gap-8 group">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#2052a3] shadow-xl shrink-0 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                <a 
+                  href="https://www.google.com/maps/search/?api=1&query=MGI+BFC+Golden+Tower+Tunis" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#2052a3] shadow-xl shrink-0 group-hover:bg-primary group-hover:text-white transition-all duration-500"
+                >
                   <MapPin size={28} />
-                </div>
-                <div>
-                  <h4 className="label-caps mb-2">{t.contact.address}</h4>
-                  <p className="text-sm">Immeuble Golden Tower B8.2, centre urbain nord - Tunis</p>
+                </a>
+                <div className="flex flex-col justify-center">
+                  <h4 className="label-caps mb-1">{t.contact.address}</h4>
+                  <a 
+                    href="https://www.google.com/maps/search/?api=1&query=MGI+BFC+Golden+Tower+Tunis" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm hover:text-primary transition-colors font-medium"
+                  >
+                    Immeuble Golden Tower B8.2, centre urbain nord - Tunis
+                  </a>
                 </div>
               </div>
+
               <div className="flex gap-8 group">
                 <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#2052a3] shadow-xl shrink-0 group-hover:bg-primary group-hover:text-white transition-all duration-500">
                   <Mail size={28} />
@@ -448,6 +461,7 @@ const Contact = ({ t }: { t: any }) => {
                   <p className="text-sm">contact@bfc.com.tn</p>
                 </div>
               </div>
+
               <div className="flex gap-8 group">
                 <a 
                   href="https://www.linkedin.com/company/mgi-bfc/?originalSubdomain=tn" 

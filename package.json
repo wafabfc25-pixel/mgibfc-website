@@ -27,7 +27,9 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.14.1",
     "rss-parser": "^3.13.0",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "nodemailer": "^6.9.7",
+    "@types/nodemailer": "^6.4.14"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.14",
