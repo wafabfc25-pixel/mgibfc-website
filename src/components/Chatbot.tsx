@@ -1,14 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, X, Bot } from 'lucide-react';
-import { chatWithBotAI, isGreeting, GREETING_RESPONSE } from '../services/chatbotService';
 
+// ── Types ────────────────────────────────────────────────────
 interface Message {
   role: 'user' | 'bot';
   text: string;
+  buttons?: string[];
 }
 
-export const Chatbot: React.FC = () => {
+interface ChatbotProps {
+  lang?: string;
+}
+
+// ── Messages de bienvenue bilingues ──────────────────────────
+const WELCOME: Record<string, { text: string; buttons: string[] }> = {
+  fr: {
+    text: "Bonjour ! Je suis l'assistant de MGI BFC. Comment puis-je vous aider aujourd'hui ?",
+    buttons: ['Nos services', 'Nous contacter', "L'équipe", 'Nos clients'],
+  },
+  en: {
+    text: "Hello! I'm the MGI BFC assistant. How can I help you today?",
+    buttons: ['Our services', 'Contact us', 'The team', 'Our clients'],
+  },
+};
+
+// ── Composant ────────────────────────────────────────────────
+export const Chatbot: React.FC<ChatbotProps> = ({ lang = 'fr' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -20,52 +38,66 @@ export const Chatbot: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Message de bienvenue à l'ouverture
   useEffect(() => {
     if (isOpen && messages.length === 0) {
+      const welcome = WELCOME[lang] ?? WELCOME['fr'];
       const timer = setTimeout(() => {
-        setMessages([{ role: 'bot', text: GREETING_RESPONSE }]);
+        setMessages([{ role: 'bot', text: welcome.text, buttons: welcome.buttons }]);
       }, 600);
       return () => clearTimeout(timer);
     }
-  }, [isOpen, messages.length]);
+  }, [isOpen, messages.length, lang]);
+
+  // Reset si la langue change (chatbot fermé)
+  useEffect(() => {
+    if (!isOpen) setMessages([]);
+  }, [lang]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  // ── Envoi d'un message ──────────────────────────────────────
+  const handleSend = async (text?: string) => {
+    const userMessage = (text ?? input).trim();
+    if (!userMessage || isLoading) return;
 
-    const userMessage = input.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsLoading(true);
 
     try {
-      // Handle greetings locally — no API call needed
-      if (isGreeting(userMessage)) {
-        setTimeout(() => {
-          setMessages(prev => [...prev, { role: 'bot', text: GREETING_RESPONSE }]);
-          setIsLoading(false);
-        }, 400);
-        return;
-      }
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage }),
+      });
 
-      // All other messages → Claude API with knowledge base
-      const response = await chatWithBotAI(userMessage);
-      setMessages(prev => [...prev, { role: 'bot', text: response }]);
+      if (!res.ok) throw new Error(`Erreur réseau : ${res.status}`);
+
+      const data = await res.json();
+
+      setMessages(prev => [...prev, {
+        role: 'bot',
+        text: data.reply,
+        buttons: data.buttons ?? [],
+      }]);
     } catch (error) {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: "Désolé, une erreur s'est produite. Contactez-nous à contact@bfc.com.tn"
+        text: lang === 'en'
+          ? 'Sorry, an error occurred. Contact us at contact@bfc.com.tn'
+          : "Désolé, une erreur s'est produite. Contactez-nous à contact@bfc.com.tn",
+        buttons: [],
       }]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Render **bold** markdown
+  // ── Rendu markdown **gras** + retours à la ligne ────────────
   const renderText = (text: string) => {
     const parts = text.split(/\*\*(.*?)\*\*/g);
     return parts.map((part, i) =>
@@ -73,6 +105,10 @@ export const Chatbot: React.FC = () => {
     );
   };
 
+  const placeholder = lang === 'en' ? 'Type your message...' : 'Tapez votre message...';
+  const hoverLabel  = lang === 'en' ? 'Need help?' : 'Besoin d\'aide ?';
+
+  // ── Rendu ───────────────────────────────────────────────────
   return (
     <div className="fixed bottom-6 right-6 z-[9999] font-sans">
       <AnimatePresence>
@@ -88,7 +124,7 @@ export const Chatbot: React.FC = () => {
                   exit={{ opacity: 0, scale: 0.8, y: 10, x: 10 }}
                   className="bg-white px-4 py-2 rounded-2xl shadow-xl border border-ink/5 text-ink text-[11px] font-bold whitespace-nowrap mb-1"
                 >
-                  Besoin d'aide ?
+                  {hoverLabel}
                   <div className="absolute bottom-[-6px] right-6 w-3 h-3 bg-white rotate-45 border-b border-r border-ink/5" />
                 </motion.div>
               )}
@@ -99,8 +135,8 @@ export const Chatbot: React.FC = () => {
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: isHovered ? 1.15 : 1, opacity: 1, y: [0, -5, 0] }}
               transition={{
-                y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-                scale: { duration: 0.3 }
+                y: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+                scale: { duration: 0.3 },
               }}
               exit={{ scale: 0, opacity: 0 }}
               onMouseEnter={() => setIsHovered(true)}
@@ -121,12 +157,13 @@ export const Chatbot: React.FC = () => {
               />
             </motion.button>
           </div>
+
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="w-[320px] sm:w-[360px] h-[450px] sm:h-[500px] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-ink/5"
+            className="w-[320px] sm:w-[360px] h-[500px] sm:h-[560px] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-ink/5"
           >
             {/* Header */}
             <div className="bg-[#2052a3] p-4 text-white flex items-center justify-between relative overflow-hidden">
@@ -158,8 +195,9 @@ export const Chatbot: React.FC = () => {
                   key={i}
                   initial={{ opacity: 0, x: m.role === 'user' ? 20 : -20, scale: 0.9 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
-                  className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
                 >
+                  {/* Bulle message */}
                   <div
                     className={`max-w-[85%] p-3.5 px-4 rounded-[1.5rem] text-[12px] leading-relaxed shadow-sm whitespace-pre-line ${
                       m.role === 'user'
@@ -169,6 +207,22 @@ export const Chatbot: React.FC = () => {
                   >
                     {renderText(m.text)}
                   </div>
+
+                  {/* Boutons contextuels sous les messages bot */}
+                  {m.role === 'bot' && m.buttons && m.buttons.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2 max-w-[90%]">
+                      {m.buttons.map((btn, j) => (
+                        <button
+                          key={j}
+                          onClick={() => handleSend(btn)}
+                          disabled={isLoading}
+                          className="text-[11px] px-3 py-1.5 bg-white border border-[#2052a3]/20 text-[#2052a3] rounded-full hover:bg-[#2052a3] hover:text-white transition-all duration-200 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed font-medium"
+                        >
+                          {btn}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               ))}
 
@@ -200,7 +254,7 @@ export const Chatbot: React.FC = () => {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Tapez votre message..."
+                  placeholder={placeholder}
                   className="w-full bg-soft-gray p-3.5 pr-12 rounded-xl text-[12px] outline-none focus:ring-4 focus:ring-primary/5 transition-all border-2 border-transparent focus:border-primary/10"
                 />
                 <button
@@ -217,7 +271,7 @@ export const Chatbot: React.FC = () => {
               </form>
               <div className="flex items-center justify-center gap-2 mt-3 opacity-30">
                 <div className="h-px bg-gray w-4" />
-                <p className="text-[9px] font-black uppercase tracking-[0.3em]">Claude AI · MGI BFC</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em]">MGI BFC · Assistant</p>
                 <div className="h-px bg-gray w-4" />
               </div>
             </div>

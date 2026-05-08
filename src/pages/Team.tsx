@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { ChevronLeft, Linkedin, Plus } from "lucide-react";
+import { ChevronLeft, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import React, { useEffect } from "react";
 
@@ -62,11 +62,6 @@ export const TeamPage = ({ t }: { t: any }) => {
                   }}
                 />
                 <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-700" />
-                <div className="absolute bottom-6 right-6">
-                   <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-primary shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
-                      <Linkedin size={20} />
-                   </div>
-                </div>
               </div>
               <div className="text-center">
                 <h3 className="text-[#2052a3] mb-1.5 text-[22px] lg:text-[26px]">{l.name}</h3>
